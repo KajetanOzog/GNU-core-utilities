@@ -10,10 +10,20 @@ fn main()
         std::process::exit(1);
     }
     let path = &args[1];
-    let it = fs::read_dir(Path::new(&path)).unwrap();
+    let it = match fs::read_dir(Path::new(&path)){
+        Ok(directories) => directories,
+        Err(_) => panic!("Path doesn't exist")
+    };
     for i in it
     {
-        println!("{}", i.unwrap().file_name().into_string().unwrap());
+        let dir_entry = match i{
+            Ok(dir) => dir,
+            Err(_) => panic!("Directory name error")
+        };
+        println!("{}", match dir_entry.file_name().into_string(){
+            Ok(string) => string,
+            Err(_) => panic!("Directory name couldn't be converted into string")
+        });
     }
 }
 
