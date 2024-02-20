@@ -1,3 +1,4 @@
 /.idea
 \.idea
-target
+rust_ls/target
+rust_ls\target
