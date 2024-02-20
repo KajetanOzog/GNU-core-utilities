@@ -4,12 +4,15 @@ use std::path::Path;
 fn main()
 {
     let args: Vec<String> = env::args().collect();
+    let path : String;
     if args.len() < 2
     {
-        println!("Chryste Panie blad");
-        std::process::exit(1);
+
+        path = "".to_string();//??
     }
-    let path = &args[1];
+    else {
+        path = args[1].clone();
+    }
     let it = match fs::read_dir(Path::new(&path)){
         Ok(directories) => directories,
         Err(_) => panic!("Path doesn't exist")
