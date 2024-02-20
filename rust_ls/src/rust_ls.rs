@@ -4,11 +4,12 @@ use std::path::Path;
 fn main()
 {
     let args: Vec<String> = env::args().collect();
+    let (switch_l, switch_r, switch_a, switch_h) : (bool, bool, bool, bool);
     let path : String;
     if args.len() < 2
     {
 
-        path = ".".to_string();//??
+        path = ".".to_string();
     }
     else {
         path = args[1].clone();
