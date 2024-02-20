@@ -8,7 +8,7 @@ fn main()
     if args.len() < 2
     {
 
-        path = "".to_string();//??
+        path = ".".to_string();//??
     }
     else {
         path = args[1].clone();
