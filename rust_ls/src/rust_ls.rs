@@ -54,7 +54,8 @@ fn ls_r(path: String, tabs_nr: u8)
 
 fn main()
 {
-    let args: Vec<String> = env::args().collect();
+    let mut args: Vec<String> = env::args().collect();
+    args.remove(0);
     let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse):
         (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
     let mut paths: Vec<String> = Vec::new();
@@ -81,7 +82,7 @@ fn main()
         } else if arg == "-r" || arg == "--reverse" {
             switch_sort_reverse = true;
         } else {
-            paths.push(arg);
+            paths.push(arg.clone());
         }
     }
 
@@ -89,15 +90,14 @@ fn main()
         paths.push(".".to_string())
     }
 
-
     for path in paths { // for all paths given as arguments to ls
-        println!("PATH:{}", path);
-        let mut read_dir = match fs::read_dir(Path::new(&path)) {
+        let mut read_dir = match fs::read_dir(Path::new(&fs::canonicalize(path).unwrap().display().to_string())) {
             Ok(read_dir) => read_dir,
             Err(_) => panic!("Path doesn't exist")
         };
 
         let mut vec_of_dir: Vec<DirEntry> = Vec::new();
+
 
         for i in read_dir {
             let dir_entry = match i {
@@ -109,6 +109,7 @@ fn main()
                 vec_of_dir.push(dir_entry);
             }
         }
+
         for dir in vec_of_dir {
             println!("{}", match dir.file_name().into_string() {
                 Ok(string) => string,
@@ -119,3 +120,11 @@ fn main()
         //ls_r(path, 0); tak wywolac ale usunac wszystko co jest na dole
 }
 
+//TODO
+// 0.zmienic na wypisywanie w funkcji
+// 1.zmienić ls_r na dodawanie do wektora
+// 2.dodac a
+// 3.dodac h
+// 4.dodac l
+// 5.dodac sort
+//
