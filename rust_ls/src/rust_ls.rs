@@ -3,7 +3,6 @@ use std::collections::HashSet;
 use std::fs::{DirEntry};
 use std::path::Path;
 use std::vec::Vec;
-use std::collections::HashSet;
 
 fn is_not_hidden(entry: &DirEntry) -> bool {
     entry
