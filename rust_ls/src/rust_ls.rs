@@ -1,5 +1,6 @@
 use std::{env, fs};
 use std::path::Path;
+use std::ptr::read;
 
 fn ls_r(path: String, tabs_nr: u8)
 {
@@ -26,8 +27,8 @@ fn ls_r(path: String, tabs_nr: u8)
         else
         {
             println!("\n{}Printing {} directory:", tabs, name);
-            let new_patch: String = format!("{}\\{}", path, name);
-            ls_r(new_patch, tabs_nr + 1);
+            let new_path: String = format!("{}\\{}", path, name);
+            ls_r(new_path, tabs_nr + 1);
         }
     }
 }
@@ -35,7 +36,8 @@ fn ls_r(path: String, tabs_nr: u8)
 fn main()
 {
     let args: Vec<String> = env::args().collect();
-    let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse) : (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
+    let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse) :
+        (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
     let mut paths : Vec<String>;
 
     for arg in args{
@@ -75,31 +77,24 @@ fn main()
     }
 
 
-    if args.len() < 2
-    {
-
-        path = ".".to_string();
-    }
-    else
-    {
-        path = args[1].clone();
+    for path in paths{ // for all paths given as arguments to ls
+        let read_dir = match fs::read_dir(Path::new(&path)){
+            Ok(read_dir) => read_dir,
+            Err(_) => panic!("Path doesn't exist")
+        };
+        for i in read_dir
+        {
+            let dir_entry = match i{
+                Ok(dir) => dir,
+                Err(_) => panic!("Directory name error")
+            };
+            println!("{}", match dir_entry.file_name().into_string(){
+                Ok(string) => string,
+                Err(_) => panic!("Directory name couldn't be converted into string")
+            });
+        }
     }
     //ls_r(path, 0); tak wywolac ale usunac wszystko co jest na dole
-    let it = match fs::read_dir(Path::new(&path)){
-        Ok(directories) => directories,
-        Err(_) => panic!("Path doesn't exist")
-    };
-    for i in it
-    {
 
-        let dir_entry = match i{
-            Ok(dir) => dir,
-            Err(_) => panic!("Directory name error")
-        };
-        println!("{}", match dir_entry.file_name().into_string(){
-            Ok(string) => string,
-            Err(_) => panic!("Directory name couldn't be converted into string")
-        });
-    }
 }
 
