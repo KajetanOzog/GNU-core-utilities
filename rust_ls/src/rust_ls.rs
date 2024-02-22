@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use std::fs::{DirEntry};
 use std::path::Path;
 use std::vec::Vec;
+use std::collections::HashSet;
 
 fn is_not_hidden(entry: &DirEntry) -> bool {
     entry
@@ -11,7 +12,37 @@ fn is_not_hidden(entry: &DirEntry) -> bool {
         .map(|s|!s.starts_with("."))
         .unwrap_or(false)
 }
+fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
+    if set_of_switches.contains("switch_sort_n")
+    {
 
+    } else if set_of_switches.contains("switch_sort_s") {
+
+    }
+    else if set_of_switches.contains("switch_sort_t") {
+
+    }
+    else if set_of_switches.contains("switch_sort_v") {
+
+    }
+    else if set_of_switches.contains("switch_sort_x") {
+
+    }
+    else if set_of_switches.contains("switch_sort_reverse") {
+
+    }
+    for dir in vec_of_dir{
+        //switch l w forze
+        //recursive a mianie
+        //human read w forze
+        if set_of_switches.contains("switch_l"){
+
+        }
+        else if set_of_switches.contains("switch_h"){
+
+        }
+    }
+}
 
 fn ls_r(path: String, tabs_nr: u8)
 {
@@ -59,6 +90,7 @@ fn main()
     args.remove(0);
     let mut switches : HashSet<&str> = HashSet::new();
     let mut paths: Vec<String> = Vec::new();
+    let mut switches: HashSet<&str>=HashSet::new();
 
     for arg in args {
         if arg == "-a" || arg == "--all" {
