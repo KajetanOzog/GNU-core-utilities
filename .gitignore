@@ -1,5 +1,4 @@
-/.idea
-\.idea
+.idea
 target
 rust_ls.exe
 rust_ls.pdb
