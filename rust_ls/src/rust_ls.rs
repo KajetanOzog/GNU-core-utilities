@@ -4,8 +4,8 @@ use std::path::Path;
 fn main()
 {
     let args: Vec<String> = env::args().collect();
-    let (mut switch_l, mut switch_r, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x) : (bool, bool, bool, bool, bool, bool, bool, bool, bool);
-    let path : String;
+    let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse) : (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
+    let mut paths : Vec<String>;
 
     for arg in args{
         if arg == "-a" || arg == "--all"{
@@ -14,10 +14,10 @@ fn main()
         else if arg == "-l"{
             switch_l = true;
         }
-        else if arg == "-r" || arg == "--reverse"{
-            switch_r = true;
+        else if arg == "-R" || arg == "--recursive"{
+            switch_recursive = true;
         }
-        else if arg == "-a" || arg == "--all"{
+        else if arg == "-h" || arg == "--human-readable"{
             switch_h = true;
         }
         else if arg == "-U" || arg == "--sort=none"{
@@ -34,6 +34,12 @@ fn main()
         }
         else if arg == "-X" || arg == "--sort=extension"{
             switch_sort_x = true;
+        }
+        else if arg == "-r" || arg == "--reverse"{
+            switch_sort_reverse = true;
+        }
+        else{
+            paths.push(arg);
         }
     }
 
