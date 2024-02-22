@@ -1,4 +1,5 @@
 use std::{env, fs};
+use std::env::current_dir;
 use std::path::Path;
 use std::ptr::read;
 
@@ -38,7 +39,7 @@ fn main()
     let args: Vec<String> = env::args().collect();
     let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse) :
         (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
-    let mut paths : Vec<String>;
+    let mut paths : Vec<String> = Vec::new();
 
     for arg in args{
         if arg == "-a" || arg == "--all"{
@@ -75,9 +76,12 @@ fn main()
             paths.push(arg);
         }
     }
-
+    if paths.len() == 0{
+        paths.push(current_dir().unwrap().display().to_string())
+    }
 
     for path in paths{ // for all paths given as arguments to ls
+        println!("{}aaaaa", path);
         let read_dir = match fs::read_dir(Path::new(&path)){
             Ok(read_dir) => read_dir,
             Err(_) => panic!("Path doesn't exist")
