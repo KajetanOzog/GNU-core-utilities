@@ -1,4 +1,5 @@
 use std::{env, fs};
+use std::collections::HashSet;
 use std::fs::{DirEntry};
 use std::path::Path;
 use std::vec::Vec;
@@ -56,31 +57,30 @@ fn main()
 {
     let mut args: Vec<String> = env::args().collect();
     args.remove(0);
-    let (mut switch_l, mut switch_recursive, mut switch_a, mut switch_h, mut switch_sort_n, mut switch_sort_s, mut switch_sort_t, mut switch_sort_v, mut switch_sort_x, mut switch_sort_reverse):
-        (bool, bool, bool, bool, bool, bool, bool, bool, bool, bool);
+    let mut switches : HashSet<&str> = HashSet::new();
     let mut paths: Vec<String> = Vec::new();
 
     for arg in args {
         if arg == "-a" || arg == "--all" {
-            switch_a = true;
-        } else if arg == "-l" {
-            switch_l = true;
+            switches.insert("switch_a");
+        } else if arg == "-l" || arg == "--long"{
+            switches.insert("switch_l");
         } else if arg == "-R" || arg == "--recursive" {
-            switch_recursive = true;
+            switches.insert("switch_recursive");
         } else if arg == "-h" || arg == "--human-readable" {
-            switch_h = true;
+            switches.insert("switch_h");
         } else if arg == "-U" || arg == "--sort=none" {
-            switch_sort_n = true;
+            switches.insert("switch_sort_n");
         } else if arg == "-S" || arg == "--sort=size" {
-            switch_sort_s = true;
+            switches.insert("switch_sort_s");
         } else if arg == "-t" || arg == "--sort=time" {
-            switch_sort_t = true;
+            switches.insert("switch_sort_t");
         } else if arg == "-v" || arg == "--sort=version" {
-            switch_sort_v = true;
+            switches.insert("switch_sort_v");
         } else if arg == "-X" || arg == "--sort=extension" {
-            switch_sort_x = true;
+            switches.insert("switch_sort_x");
         } else if arg == "-r" || arg == "--reverse" {
-            switch_sort_reverse = true;
+            switches.insert("switch_sort_reverse");
         } else {
             paths.push(arg.clone());
         }
@@ -90,13 +90,13 @@ fn main()
         paths.push(".".to_string())
     }
 
+    let mut vec_of_dir: Vec<DirEntry> = Vec::new();
+
     for path in paths { // for all paths given as arguments to ls
         let mut read_dir = match fs::read_dir(Path::new(&fs::canonicalize(path).unwrap().display().to_string())) {
             Ok(read_dir) => read_dir,
             Err(_) => panic!("Path doesn't exist")
         };
-
-        let mut vec_of_dir: Vec<DirEntry> = Vec::new();
 
 
         for i in read_dir {
