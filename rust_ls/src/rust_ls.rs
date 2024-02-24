@@ -11,6 +11,8 @@ fn is_not_hidden(entry: &DirEntry) -> bool {
         .map(|s|!s.starts_with("."))
         .unwrap_or(false)
 }
+
+
 fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
     if set_of_switches.contains("switch_sort_n")
     {
@@ -43,6 +45,7 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
     }
 }
 
+
 fn ls_r(path: String, tabs_nr: u8)
 {
     let it = match fs::read_dir(Path::new(&path)) {
@@ -71,17 +74,7 @@ fn ls_r(path: String, tabs_nr: u8)
         }
     }
 }
-    // for i in it
-    // {
-    //     let dir_entry = match i{
-    //         Ok(dir) => dir,
-    //         Err(_) => panic!("Directory name error")
-    //     };
-    //     println!("{}", match dir_entry.file_name().into_string(){
-    //         Ok(string) => string,
-    //         Err(_) => panic!("Directory name couldn't be converted into string")
-    //     })
-    // }
+
 
 fn main()
 {
@@ -141,7 +134,7 @@ fn main()
             }
         }
 
-        for dir in vec_of_dir {
+        for dir in &vec_of_dir {
             println!("{}", match dir.file_name().into_string() {
                 Ok(string) => string,
                 Err(_) => panic!("Directory name couldn't be converted into string")
