@@ -4,7 +4,6 @@ use std::{env, fs};
 use std::collections::HashSet;
 use std::fs::{DirEntry};
 use std::path::Path;
-use std::time::{SystemTime, UNIX_EPOCH};
 use std::vec::Vec;
 use chrono::{DateTime, Utc};
 
@@ -44,19 +43,32 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
         if !set_of_switches.contains("switch_l") {
             let metadata = dir_entry.metadata().unwrap();
             let file_size = metadata.len();
-            let permissions = metadata.permissions();
             let last_modified_sys_time = metadata.modified().unwrap();
             let last_modified : DateTime<Utc> = last_modified_sys_time.int();
             let file_name = dir_entry.file_name().into_string().unwrap();
-
-            if set_of_switches.contains("switch_h") {
-                print!("{}  {}  {}  {}",
-                       permissions, file_size, last_modified, file_name
-                );
-            } else {
-                print!("{}  {}  {}  {} ",
-                       permissions, file_size, last_modified, file_name
-                );
+            if env::consts::OS == "windows"{
+                let permissions = metadata.permissions().readonly();
+                if set_of_switches.contains("switch_h") {
+                    print!("{}  {}  {}  {}",
+                        permissions, file_size, last_modified, file_name
+                    );
+                } else {
+                    print!("{}  {}  {}  {} ",
+                        permissions, file_size, last_modified, file_name
+                    );
+                }
+            }
+            else{
+                let permissions = metadata.permissions().mode();
+                if set_of_switches.contains("switch_h") {
+                    print!("{}  {}  {}  {}",
+                           permissions, file_size, last_modified, file_name
+                    );
+                } else {
+                    print!("{}  {}  {}  {} ",
+                           permissions, file_size, last_modified, file_name
+                    );
+                }
             }
         }
     }
