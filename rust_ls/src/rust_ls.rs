@@ -17,7 +17,7 @@ fn is_not_hidden(entry: &DirEntry) -> bool {
         .unwrap_or(false)
 }
 
-fn sort(mut vec_of_entries: Vec<DirEntry>, flag: char)
+fn sort(vec_of_entries: &mut Vec<DirEntry>, flag: char)
 {
     let mut i: usize = 1;
     if flag == 't'
@@ -91,7 +91,7 @@ fn sort(mut vec_of_entries: Vec<DirEntry>, flag: char)
 }
 
 
-fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
+fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
     if set_of_switches.contains("switch_sort_n")
     {
         sort(vec_of_dir, 'n');
