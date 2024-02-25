@@ -1,9 +1,13 @@
+extern crate chrono;
+
 use std::{env, fs};
 use std::collections::HashSet;
 use std::fs::{DirEntry};
 use std::os::windows::fs::MetadataExt;
 use std::path::Path;
 use std::vec::Vec;
+use chrono::{DateTime, Utc};
+
 
 fn is_not_hidden(entry: &DirEntry) -> bool {
     entry
@@ -106,17 +110,47 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
     else if set_of_switches.contains("switch_sort_reverse") {
         println!("nie dziala jeszcze");
     }
-    for dir in vec_of_dir{
+    for dir_entry in vec_of_dir{
         //switch l w forze
-        //recursive a mianie
+        //recursive a mainie
         //human read w forze
-        if set_of_switches.contains("switch_l"){
-
+        if !set_of_switches.contains("switch_l") {
+            print!("{} ", dir_entry.file_name().into_string().unwrap());
         }
-        else if set_of_switches.contains("switch_h"){
+        else{
+            let metadata = dir_entry.metadata().unwrap();
+            let file_size = metadata.len();
+            let last_modified_sys_time = metadata.modified().unwrap();
+            let last_modified : DateTime<Utc> = last_modified_sys_time.int();
+            let file_name = dir_entry.file_name().into_string().unwrap();
 
+            if env::consts::OS == "windows"{
+                let permissions = metadata.permissions().readonly();
+                if set_of_switches.contains("switch_h") {
+                    print!("{}  {}  {}  {}",
+                           permissions, file_size, last_modified, file_name
+                    );
+                } else {
+                    print!("{}  {}  {}  {} ",
+                           permissions, file_size, last_modified, file_name
+                    );
+                }
+            }
+            else{
+                let permissions = metadata.permissions().mode();
+                if set_of_switches.contains("switch_h") {
+                    print!("{}  {}  {}  {}",
+                           permissions, file_size, last_modified, file_name
+                    );
+                } else {
+                    print!("{}  {}  {}  {} ",
+                           permissions, file_size, last_modified, file_name
+                    );
+                }
+            }
         }
     }
+    println!();
 }
 
 fn ls_r(path: &String)
