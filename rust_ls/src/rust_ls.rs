@@ -41,20 +41,24 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
         //recursive a mainie
         //human read w forze
         if !set_of_switches.contains("switch_l") {
+            print!("{} ", dir_entry.file_name().into_string().unwrap());
+        }
+        else{
             let metadata = dir_entry.metadata().unwrap();
             let file_size = metadata.len();
             let last_modified_sys_time = metadata.modified().unwrap();
             let last_modified : DateTime<Utc> = last_modified_sys_time.int();
             let file_name = dir_entry.file_name().into_string().unwrap();
+
             if env::consts::OS == "windows"{
                 let permissions = metadata.permissions().readonly();
                 if set_of_switches.contains("switch_h") {
                     print!("{}  {}  {}  {}",
-                        permissions, file_size, last_modified, file_name
+                           permissions, file_size, last_modified, file_name
                     );
                 } else {
                     print!("{}  {}  {}  {} ",
-                        permissions, file_size, last_modified, file_name
+                           permissions, file_size, last_modified, file_name
                     );
                 }
             }
@@ -72,6 +76,7 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
             }
         }
     }
+    println!();
 }
 
 
