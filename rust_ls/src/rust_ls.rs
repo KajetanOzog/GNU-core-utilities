@@ -121,7 +121,7 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
             let metadata = dir_entry.metadata().unwrap();
             let file_size = metadata.len();
             let last_modified_sys_time = metadata.modified().unwrap();
-            let last_modified : DateTime<Utc> = last_modified_sys_time.int();
+            let last_modified : DateTime<Utc> = last_modified_sys_time.into();
             let file_name = dir_entry.file_name().into_string().unwrap();
 
             if env::consts::OS == "windows"{
@@ -137,7 +137,7 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
                 }
             }
             else{
-                let permissions = metadata.permissions().mode();
+                /*let permissions = metadata.permissions().mode();
                 if set_of_switches.contains("switch_h") {
                     print!("{}  {}  {}  {}",
                            permissions, file_size, last_modified, file_name
@@ -146,7 +146,7 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
                     print!("{}  {}  {}  {} ",
                            permissions, file_size, last_modified, file_name
                     );
-                }
+                }*/
             }
         }
     }
@@ -226,36 +226,39 @@ fn main()
     }
 
     let mut vec_of_dir: Vec<DirEntry> = Vec::new();
-
-    for path in paths { // for all paths given as arguments to ls
-        let mut read_dir = match fs::read_dir(Path::new(&fs::canonicalize(path).unwrap().display().to_string())) {
-            Ok(read_dir) => read_dir,
-            Err(_) => panic!("Path doesn't exist")
-        };
-
-
-        for i in read_dir {
-            let dir_entry = match i {
-                Ok(dir) => dir,
-                Err(_) => panic!("Error in file")
-            };
-            if is_not_hidden(&dir_entry)
-            {
-                vec_of_dir.push(dir_entry);
-            }
+    if switches.contains("switch_recursive"){
+        for path in paths { // for all paths given as arguments to ls
+            ls_r(&path);
         }
+    }
+    else {
+        for path in paths { // for all paths given as arguments to ls
+            let mut read_dir = match fs::read_dir(Path::new(&fs::canonicalize(path).unwrap().display().to_string())) {
+                Ok(read_dir) => read_dir,
+                Err(_) => panic!("Path doesn't exist")
+            };
 
-        for dir in &vec_of_dir {
-            println!("{}", match dir.file_name().into_string() {
-                Ok(string) => string,
-                Err(_) => panic!("Directory name couldn't be converted into string")
-            })
-        };
+
+            for i in read_dir {
+                let dir_entry = match i {
+                    Ok(dir) => dir,
+                    Err(_) => panic!("Error in file")
+                };
+                if is_not_hidden(&dir_entry)
+                {
+                    vec_of_dir.push(dir_entry);
+                }
+            }
+
+            for dir in &vec_of_dir {
+                println!("{}", match dir.file_name().into_string() {
+                    Ok(string) => string,
+                    Err(_) => panic!("Directory name couldn't be converted into string")
+                })
+            };
+        }
     }
 
-    for path in paths { // for all paths given as arguments to ls
-        ls_r(&path);
-    }
 
 }
 
