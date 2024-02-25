@@ -1,6 +1,7 @@
 use std::{env, fs};
 use std::collections::HashSet;
 use std::fs::{DirEntry};
+use std::os::windows::fs::MetadataExt;
 use std::path::Path;
 use std::vec::Vec;
 
@@ -12,25 +13,98 @@ fn is_not_hidden(entry: &DirEntry) -> bool {
         .unwrap_or(false)
 }
 
+fn sort(mut vec_of_entries: Vec<DirEntry>, flag: char)
+{
+    let mut i: usize = 1;
+    if flag == 't'
+    {
+        while i < vec_of_entries.len()
+        {
+            let mut j = i;
+            let prev = fs::metadata(vec_of_entries[j-1].file_name().into_string().unwrap()).unwrap().created().unwrap();
+            let next = fs::metadata(vec_of_entries[j].file_name().into_string().unwrap()).unwrap().created().unwrap();
+            while j > 0 &&  prev > next {
+                vec_of_entries.swap(j, j-1);
+                j -= 1;
+            }
+            i += 1;
+        }
+    }
+    else if flag == 's'
+    {
+        while i < vec_of_entries.len()
+        {
+            let mut j = i;
+            let prev = fs::metadata(vec_of_entries[j-1].file_name().into_string().unwrap()).unwrap().file_size();
+            let next = fs::metadata(vec_of_entries[j].file_name().into_string().unwrap()).unwrap().file_size();
+            while j > 0 &&  prev > next {
+                vec_of_entries.swap(j, j-1);
+                j -= 1;
+            }
+            i += 1;
+        }
+    }
+    else if flag == 'x'
+    {
+        while i < vec_of_entries.len()
+        {
+            let mut j = i;
+            let mut c1: &str = "";
+            let mut c2: &str = "";
+            let prev = vec_of_entries[j-1].file_name().into_string().unwrap();
+            if prev.contains(".")
+            {
+                let n = prev.find(".").unwrap();
+                c1 = &prev[n..];
+            }
+            let next = vec_of_entries[j].file_name().into_string().unwrap();
+            if next.contains(".")
+            {
+                let n = next.find(".").unwrap();
+                c2 =  &next[n..];
+            }
+            while j > 0 &&  c1 > c2 {
+                vec_of_entries.swap(j, j-1);
+                j -= 1;
+            }
+            i += 1;
+        }
+    }
+    else
+    {
+        while i < vec_of_entries.len() - 1
+        {
+            let mut j = i;
+            let prev: String = vec_of_entries[j-1].file_name().into_string().unwrap();
+            let next: String = vec_of_entries[j].file_name().into_string().unwrap();
+            while j > 0 && prev > next {
+                vec_of_entries.swap(j, j-1);
+                j -= 1;
+            }
+            i += 1;
+        }
+    }
+}
+
 
 fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
     if set_of_switches.contains("switch_sort_n")
     {
-
+        sort(vec_of_dir, 'n');
     } else if set_of_switches.contains("switch_sort_s") {
-
+        sort(vec_of_dir, 's');
     }
     else if set_of_switches.contains("switch_sort_t") {
-
+        sort(vec_of_dir, 't');
     }
     else if set_of_switches.contains("switch_sort_v") {
-
+        sort(vec_of_dir, 'x');
     }
     else if set_of_switches.contains("switch_sort_x") {
-
+        sort(vec_of_dir, 'x');
     }
     else if set_of_switches.contains("switch_sort_reverse") {
-
+        println!("nie dziala jeszcze");
     }
     for dir in vec_of_dir{
         //switch l w forze
@@ -45,15 +119,14 @@ fn print_vec_args(vec_of_dir: Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->(
     }
 }
 
-
-fn ls_r(path: String, tabs_nr: u8)
+fn ls_r(path: &String)
 {
     let it = match fs::read_dir(Path::new(&path)) {
         Ok(directories) => directories,
         Err(_) => panic!("Path doesn't exist")
     };
-    let tabs = "\t".repeat(tabs_nr as usize);
-    println!("{}--Names--", tabs);
+    let mut paths: Vec<String> = Vec::new();
+    println!("{}:\n", path);
     for i in it
     {
         let dir_entry = match i {
@@ -66,21 +139,25 @@ fn ls_r(path: String, tabs_nr: u8)
         };
         if name.contains(".")
         {
-            println!("{}{}", tabs, name)
-        } else {
-            println!("\n{}Printing {} directory:", tabs, name);
-            let new_path: String = format!("{}\\{}", path, name);
-            ls_r(new_path, tabs_nr + 1);
+            println!("{}", name)
         }
+        else
+        {
+            let new_path: String = format!("{}\\{}", path, name);
+            paths.push(new_path);
+        }
+
+    }
+    for i in &paths
+    {
+        ls_r(i);
     }
 }
-
 
 fn main()
 {
     let mut args: Vec<String> = env::args().collect();
     args.remove(0);
-    let mut switches : HashSet<&str> = HashSet::new();
     let mut paths: Vec<String> = Vec::new();
     let mut switches: HashSet<&str>=HashSet::new();
 
@@ -141,7 +218,11 @@ fn main()
             })
         };
     }
-        //ls_r(path, 0); tak wywolac ale usunac wszystko co jest na dole
+
+    for path in paths { // for all paths given as arguments to ls
+        ls_r(&path);
+    }
+
 }
 
 //TODO
