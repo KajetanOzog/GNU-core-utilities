@@ -7,7 +7,7 @@ use std::os::windows::fs::MetadataExt;
 use std::path::Path;
 use std::vec::Vec;
 use chrono::{DateTime, Utc};
-
+use humansize::{format_size, DECIMAL};
 
 fn is_not_hidden(entry: &DirEntry) -> bool {
     entry
@@ -16,18 +16,18 @@ fn is_not_hidden(entry: &DirEntry) -> bool {
         .map(|s|!s.starts_with("."))
         .unwrap_or(false)
 }
-
 fn sort(vec_of_entries: &mut Vec<DirEntry>, flag: char)
 {
     let mut i: usize = 1;
     if flag == 't'
     {
+        // vec_of_entries.sort_by(|a, b| a.metadata().unwrap().created().cmp(&b.metadata().unwrap().created()));
         while i < vec_of_entries.len()
         {
             let mut j = i;
             let prev = fs::metadata(vec_of_entries[j-1].file_name().into_string().unwrap()).unwrap().created().unwrap();
             let next = fs::metadata(vec_of_entries[j].file_name().into_string().unwrap()).unwrap().created().unwrap();
-            while j > 0 &&  prev > next {
+            while j > 0 &&  prev.gt(&next)  {
                 vec_of_entries.swap(j, j-1);
                 j -= 1;
             }
@@ -91,7 +91,7 @@ fn sort(vec_of_entries: &mut Vec<DirEntry>, flag: char)
 }
 
 
-fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:HashSet<&str> ) ->() {
+fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:&HashSet<&str> ) ->() {
     if set_of_switches.contains("switch_sort_n")
     {
         sort(vec_of_dir, 'n');
@@ -115,7 +115,7 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:HashSet<&str> 
         //recursive a mainie
         //human read w forze
         if !set_of_switches.contains("switch_l") {
-            print!("{} ", dir_entry.file_name().into_string().unwrap());
+            println!("{} ", dir_entry.file_name().into_string().unwrap());
         }
         else{
             let metadata = dir_entry.metadata().unwrap();
@@ -127,11 +127,12 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:HashSet<&str> 
             if env::consts::OS == "windows"{
                 let permissions = metadata.permissions().readonly();
                 if set_of_switches.contains("switch_h") {
-                    print!("{}  {}  {}  {}",
-                           permissions, file_size, last_modified, file_name
+                    let human_readable_file_size: String = format_size(file_size, DECIMAL);
+                    println!("{}  {}  {}  {}",
+                           permissions, human_readable_file_size, last_modified, file_name
                     );
                 } else {
-                    print!("{}  {}  {}  {} ",
+                    println!("{}  {}  {}  {} ",
                            permissions, file_size, last_modified, file_name
                     );
                 }
@@ -233,11 +234,10 @@ fn main()
     }
     else {
         for path in paths { // for all paths given as arguments to ls
-            let mut read_dir = match fs::read_dir(Path::new(&fs::canonicalize(path).unwrap().display().to_string())) {
+            let read_dir = match fs::read_dir(Path::new(&(path))) {
                 Ok(read_dir) => read_dir,
                 Err(_) => panic!("Path doesn't exist")
             };
-
 
             for i in read_dir {
                 let dir_entry = match i {
@@ -250,12 +250,7 @@ fn main()
                 }
             }
 
-            for dir in &vec_of_dir {
-                println!("{}", match dir.file_name().into_string() {
-                    Ok(string) => string,
-                    Err(_) => panic!("Directory name couldn't be converted into string")
-                })
-            };
+            print_vec_args(&mut vec_of_dir, & switches);
         }
     }
 

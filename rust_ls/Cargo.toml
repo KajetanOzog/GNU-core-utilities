@@ -11,3 +11,4 @@ path = "src/rust_ls.rs"
 
 [dependencies]
 "chrono"="0.4.34"
+humansize = "2.0.0"
