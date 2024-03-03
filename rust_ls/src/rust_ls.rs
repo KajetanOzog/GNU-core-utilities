@@ -108,7 +108,6 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:&HashSet<&str>
         sort(vec_of_dir, 'x');
     }
     else if set_of_switches.contains("switch_sort_reverse") {
-        println!("nie dziala jeszcze");
         vec_of_dir.reverse();
     }
 
@@ -265,7 +264,6 @@ fn main()
 //TODO
 // 0.zmienic na wypisywanie w funkcji
 // 1.zmienić ls_r na dodawanie do wektora
-// 2.dodac a //testuje
 // 4.dodac l
 // 5.dodac sort
 //
