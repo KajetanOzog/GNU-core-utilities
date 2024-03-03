@@ -109,7 +109,9 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:&HashSet<&str>
     }
     else if set_of_switches.contains("switch_sort_reverse") {
         println!("nie dziala jeszcze");
+        vec_of_dir.reverse();
     }
+
     for dir_entry in vec_of_dir{
         //switch l w forze
         //recursive a mainie
@@ -244,8 +246,11 @@ fn main()
                     Ok(dir) => dir,
                     Err(_) => panic!("Error in file")
                 };
-                if is_not_hidden(&dir_entry)
+                if is_not_hidden(&dir_entry) && (!switches.contains("switch_a"))
                 {
+                    vec_of_dir.push(dir_entry);
+                }
+                else {
                     vec_of_dir.push(dir_entry);
                 }
             }
@@ -260,8 +265,7 @@ fn main()
 //TODO
 // 0.zmienic na wypisywanie w funkcji
 // 1.zmienić ls_r na dodawanie do wektora
-// 2.dodac a
-// 3.dodac h
+// 2.dodac a //testuje
 // 4.dodac l
 // 5.dodac sort
 //
