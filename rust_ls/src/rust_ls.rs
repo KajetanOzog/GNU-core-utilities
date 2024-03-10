@@ -25,8 +25,8 @@ fn sort(vec_of_entries: &mut Vec<DirEntry>, flag: char)
         while i < vec_of_entries.len()
         {
             let mut j = i;
-            let prev = fs::metadata(vec_of_entries[j-1].file_name().into_string().unwrap()).unwrap().created().unwrap();
-            let next = fs::metadata(vec_of_entries[j].file_name().into_string().unwrap()).unwrap().created().unwrap();
+            let prev =  vec_of_entries[j-1].metadata().unwrap().created().unwrap();
+            let next = vec_of_entries[j].metadata().unwrap().created().unwrap();
             while j > 0 &&  prev.gt(&next)  {
                 vec_of_entries.swap(j, j-1);
                 j -= 1;
@@ -39,13 +39,14 @@ fn sort(vec_of_entries: &mut Vec<DirEntry>, flag: char)
         while i < vec_of_entries.len()
         {
             let mut j = i;
-            let prev = fs::metadata(vec_of_entries[j-1].file_name().into_string().unwrap()).unwrap().file_size();
-            let next = fs::metadata(vec_of_entries[j].file_name().into_string().unwrap()).unwrap().file_size();
+            let prev = vec_of_entries[j-1].metadata().unwrap().file_size();
+            let next = vec_of_entries[j].metadata().unwrap().file_size();
             while j > 0 &&  prev > next {
                 vec_of_entries.swap(j, j-1);
                 j -= 1;
             }
             i += 1;
+            //
         }
     }
     else if flag == 'x'
