@@ -102,9 +102,6 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:&HashSet<&str>
     else if set_of_switches.contains("switch_sort_t") {
         sort(vec_of_dir, 't');
     }
-    else if set_of_switches.contains("switch_sort_v") {
-        sort(vec_of_dir, 'x');
-    }
     else if set_of_switches.contains("switch_sort_x") {
         sort(vec_of_dir, 'x');
     }
@@ -126,31 +123,33 @@ fn print_vec_args(vec_of_dir: &mut Vec<DirEntry>, set_of_switches:&HashSet<&str>
             let last_modified : DateTime<Utc> = last_modified_sys_time.into();
             let file_name = dir_entry.file_name().into_string().unwrap();
 
-            if env::consts::OS == "windows"{
+            #[cfg(target_family = "windows")]{
                 let permissions = metadata.permissions().readonly();
                 if set_of_switches.contains("switch_h") {
                     let human_readable_file_size: String = format_size(file_size, DECIMAL);
                     println!("{}  {}  {}  {}",
-                           permissions, human_readable_file_size, last_modified, file_name
+                             permissions, human_readable_file_size, last_modified, file_name
                     );
                 } else {
                     println!("{}  {}  {}  {} ",
-                           permissions, file_size, last_modified, file_name
+                             permissions, file_size, last_modified, file_name
                     );
                 }
             }
-            else{
-                /*let permissions = metadata.permissions().mode();
+            #[cfg(target_family = "unix")]{
+                let permissions = metadata.permissions().mode();
                 if set_of_switches.contains("switch_h") {
-                    print!("{}  {}  {}  {}",
-                           permissions, file_size, last_modified, file_name
+                    let human_readable_file_size: String = format_size(file_size, DECIMAL);
+                    println!("{}  {}  {}  {}",
+                             permissions, human_readable_file_size, last_modified, file_name
                     );
                 } else {
                     print!("{}  {}  {}  {} ",
                            permissions, file_size, last_modified, file_name
                     );
-                }*/
+                }
             }
+
         }
     }
     println!();
@@ -213,8 +212,6 @@ fn main()
             switches.insert("switch_sort_s");
         } else if arg == "-t" || arg == "--sort=time" {
             switches.insert("switch_sort_t");
-        } else if arg == "-v" || arg == "--sort=version" {
-            switches.insert("switch_sort_v");
         } else if arg == "-X" || arg == "--sort=extension" {
             switches.insert("switch_sort_x");
         } else if arg == "-r" || arg == "--reverse" {
@@ -261,10 +258,3 @@ fn main()
 
 
 }
-
-//TODO
-// 0.zmienic na wypisywanie w funkcji
-// 1.zmienić ls_r na dodawanie do wektora
-// 4.dodac l
-// 5.dodac sort
-//
